@@ -1,0 +1,2520 @@
+Glide.with(getApplicationContext()).load(Uri.parse(_data.get((int)_position).get("img").toString())).into(binding.imageview2);
+if (save) {
+	binding.linear1.setVisibility(View.GONE);
+	if (sv.getString(_data.get((int)_position).get("subject").toString(), "").equals("save")) {
+		binding.linear1.setVisibility(View.VISIBLE);
+		binding.textview1.setText(_data.get((int)_position).get("subject").toString());
+		binding.textview3.setText(_data.get((int)_position).get("Introduction").toString());
+		binding.textview5.setText(_data.get((int)_position).get("steps").toString());
+		binding.textview1.setTypeface(Typeface.createFromAsset(getAssets(),"fonts/lvery_bold.ttf"), 0);
+		binding.textview2.setTypeface(Typeface.createFromAsset(getAssets(),"fonts/bold.ttf"), 0);
+		binding.textview6.setTypeface(Typeface.createFromAsset(getAssets(),"fonts/bold.ttf"), 0);
+		binding.textview5.setTypeface(Typeface.createFromAsset(getAssets(),"fonts/normal.ttf"), 1);
+		binding.textview3.setTypeface(Typeface.createFromAsset(getAssets(),"fonts/normal.ttf"), 1);
+		binding.imageview1.setImageResource(R.drawable.icon_bookmark_round);
+		if (mode.getString("mode", "").equals("light")) {
+			binding.vscroll1.setBackgroundColor(0xFFF1F1F1);
+			binding.linear3.setBackground(new GradientDrawable() { public GradientDrawable getIns(int a, int b, int c, int d) { this.setCornerRadius(a); this.setStroke(b, c); this.setColor(d); return this; } }.getIns((int)35, (int)2, 0xFF9E9E9E, Color.TRANSPARENT));
+			binding.textview1.setTextColor(0xFF000000);
+			binding.textview2.setBackground(new GradientDrawable() { public GradientDrawable getIns(int a, int b, int c, int d) { this.setCornerRadius(a); this.setStroke(b, c); this.setColor(d); return this; } }.getIns((int)25, (int)1, 0xFFBDBDBD, 0xFFEEEEEE));
+			binding.textview6.setBackground(new GradientDrawable() { public GradientDrawable getIns(int a, int b, int c, int d) { this.setCornerRadius(a); this.setStroke(b, c); this.setColor(d); return this; } }.getIns((int)25, (int)1, 0xFFBDBDBD, 0xFFEEEEEE));
+			binding.textview2.setTextColor(0xFF616161);
+			binding.textview6.setTextColor(0xFF616161);
+			binding.textview3.setTextColor(0xFF424242);
+			binding.textview5.setTextColor(0xFF424242);
+			
+			final android.widget.TextView noteView = binding.textview5;
+			final float density = getResources().getDisplayMetrics().density;
+			final android.content.Context imageContext = noteView.getContext();
+			final android.content.res.Resources imageResources = imageContext.getResources();
+			
+			// ----------------------------------
+			// 1. تنظیم رنگ‌ها
+			// ----------------------------------
+			
+			final int englishColor = 0xFF000000;
+			final int englishShadow = 0xFFB0B0B0;
+			final int noteBackground = 0xFFE5F2FF;
+			final int noteTextColor = 0xFF0879DB;
+			
+			final String noteText = noteView.getText().toString();
+			
+			final android.text.SpannableStringBuilder styledText =
+			new android.text.SpannableStringBuilder(noteText);
+			
+			// شناسه پردازش برای جلوگیری از اشتباه در بازیافت آیتم‌ها
+			final Object renderToken = new Object();
+			noteView.setTag(renderToken);
+			
+			// ----------------------------------
+			// 2. برجسته‌سازی کلمات انگلیسی
+			// ----------------------------------
+			
+			java.util.regex.Matcher englishMatcher =
+			java.util.regex.Pattern.compile(
+			"[A-Za-z]+(?:['’-][A-Za-z]+)*"
+			).matcher(styledText);
+			
+			while (englishMatcher.find()) {
+				
+				styledText.setSpan(
+				new android.text.style.CharacterStyle() {
+					
+					@Override
+					public void updateDrawState(android.text.TextPaint paint) {
+						
+						paint.setColor(englishColor);
+						paint.setFakeBoldText(true);
+						paint.setStyle(android.graphics.Paint.Style.FILL_AND_STROKE);
+						paint.setStrokeWidth(0.65f * density);
+						
+						paint.setShadowLayer(
+						1.2f * density,
+						0f,
+						0f,
+						englishShadow
+						);
+					}
+				},
+				englishMatcher.start(),
+				englishMatcher.end(),
+				android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+				);
+			}
+			
+			// ----------------------------------
+			// 3. ساخت کادر نکته‌ها
+			// ----------------------------------
+			
+			int searchIndex = 0;
+			
+			while (searchIndex < styledText.length()) {
+				
+				int start = styledText.toString().indexOf("نکته:", searchIndex);
+				
+				if (start == -1) break;
+				
+				int end = styledText.toString().indexOf("\n", start);
+				
+				if (end == -1) {
+					end = styledText.length();
+				}
+				
+				styledText.setSpan(
+				new android.text.style.ReplacementSpan() {
+					
+					@Override
+					public int getSize(
+					android.graphics.Paint paint,
+					CharSequence text,
+					int start,
+					int end,
+					android.graphics.Paint.FontMetricsInt fm
+					) {
+						
+						return (int) paint.measureText(text, start, end)
+						+ (int)(20 * density);
+					}
+					
+					@Override
+					public void draw(
+					android.graphics.Canvas canvas,
+					CharSequence text,
+					int start,
+					int end,
+					float x,
+					int top,
+					int y,
+					int bottom,
+					android.graphics.Paint paint
+					) {
+						
+						android.graphics.Paint bg =
+						new android.graphics.Paint(
+						android.graphics.Paint.ANTI_ALIAS_FLAG
+						);
+						
+						bg.setColor(noteBackground);
+						
+						float padH = 10 * density;
+						float padV = 4 * density;
+						
+						float textWidth = paint.measureText(text, start, end);
+						
+						android.graphics.RectF rect =
+						new android.graphics.RectF(
+						x,
+						y + paint.ascent() - padV,
+						x + textWidth + (20 * density),
+						y + paint.descent() + padV
+						);
+						
+						canvas.drawRoundRect(
+						rect,
+						6 * density,
+						6 * density,
+						bg
+						);
+						
+						android.graphics.Paint textPaint =
+						new android.graphics.Paint(paint);
+						
+						textPaint.setColor(noteTextColor);
+						
+						textPaint.setTypeface(
+						android.graphics.Typeface.create(
+						paint.getTypeface(),
+						android.graphics.Typeface.BOLD
+						)
+						);
+						
+						canvas.drawText(
+						text,
+						start,
+						end,
+						x + padH,
+						y,
+						textPaint
+						);
+					}
+				},
+				start,
+				end,
+				android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+				);
+				
+				searchIndex = end;
+			}
+			
+			// ----------------------------------
+			// 4. شناسایی لینک تصاویر
+			// ----------------------------------
+			
+			java.util.ArrayList<String> imageUrls =
+			new java.util.ArrayList<String>();
+			
+			java.util.ArrayList<Integer> imagePositions =
+			new java.util.ArrayList<Integer>();
+			
+			java.util.ArrayList<Integer> originalStarts =
+			new java.util.ArrayList<Integer>();
+			
+			java.util.ArrayList<Integer> originalEnds =
+			new java.util.ArrayList<Integer>();
+			
+			java.util.regex.Matcher urlMatcher =
+			java.util.regex.Pattern.compile("https?://\\S+")
+			.matcher(noteText);
+			
+			while (urlMatcher.find()) {
+				
+				String url = urlMatcher.group();
+				
+				int start = urlMatcher.start();
+				int end = urlMatcher.end();
+				
+				// حذف علائم نگارشی انتهای لینک
+				while (
+				url.length() > 0 &&
+				".,;،؛:!?؟)]}".indexOf(
+				url.charAt(url.length() - 1)
+				) != -1
+				) {
+					
+					url = url.substring(0, url.length() - 1);
+					end--;
+				}
+				
+				if (url.length() > 0) {
+					
+					originalStarts.add(start);
+					originalEnds.add(end);
+					imageUrls.add(url);
+				}
+			}
+			
+			// جایگزینی لینک‌ها با محل تصویر
+			int offset = 0;
+			
+			for (int i = 0; i < imageUrls.size(); i++) {
+				
+				int start = originalStarts.get(i) + offset;
+				int end = originalEnds.get(i) + offset;
+				
+				styledText.replace(start, end, "\uFFFC");
+				
+				imagePositions.add(start);
+				
+				offset += 1 - (
+				originalEnds.get(i) - originalStarts.get(i)
+				);
+			}
+			
+			// ----------------------------------
+			// 5. تنظیم کلیک روی تصاویر
+			// ----------------------------------
+			
+			noteView.setHighlightColor(0x00000000);
+			noteView.setLinksClickable(true);
+			
+			noteView.setMovementMethod(
+			android.text.method.LinkMovementMethod.getInstance()
+			);
+			
+			// ----------------------------------
+			// 6. ایجاد تصاویر و دانلود
+			// ----------------------------------
+			
+			final int thumbSize = (int)(30 * density);
+			
+			for (int i = 0; i < imageUrls.size(); i++) {
+				
+				final String imageUrl = imageUrls.get(i);
+				final int imagePosition = imagePositions.get(i);
+				
+				final android.graphics.Bitmap[] imageHolder =
+				new android.graphics.Bitmap[1];
+				
+				final android.text.style.ImageSpan[] spanHolder =
+				new android.text.style.ImageSpan[1];
+				
+				// تصویر موقت
+				android.graphics.drawable.GradientDrawable placeholder =
+				new android.graphics.drawable.GradientDrawable();
+				
+				placeholder.setColor(0xFF444444);
+				placeholder.setCornerRadius(8 * density);
+				
+				placeholder.setBounds(
+				0,
+				0,
+				thumbSize,
+				thumbSize
+				);
+				
+				spanHolder[0] = new android.text.style.ImageSpan(
+				placeholder,
+				imageUrl,
+				android.text.style.ImageSpan.ALIGN_BASELINE
+				);
+				
+				styledText.setSpan(
+				spanHolder[0],
+				imagePosition,
+				imagePosition + 1,
+				android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+				);
+				
+				// ----------------------------------
+				// 7. کلیک و نمایش تصویر بزرگ
+				// ----------------------------------
+				
+				styledText.setSpan(
+				new android.text.style.ClickableSpan() {
+					
+					@Override
+					public void updateDrawState(android.text.TextPaint ds) {
+						ds.setUnderlineText(false);
+					}
+					
+					@Override
+					public void onClick(android.view.View v) {
+						
+						if (imageHolder[0] == null) return;
+						
+						final android.app.Dialog dialog =
+						new android.app.Dialog(imageContext);
+						
+						android.widget.FrameLayout root =
+						new android.widget.FrameLayout(imageContext);
+						
+						root.setBackgroundColor(0xFF111111);
+						
+						// تصویر اصلی
+						android.widget.ImageView preview =
+						new android.widget.ImageView(imageContext);
+						
+						preview.setImageBitmap(imageHolder[0]);
+						
+						preview.setScaleType(
+						android.widget.ImageView.ScaleType.FIT_CENTER
+						);
+						
+						android.graphics.drawable.GradientDrawable imageBackground =
+						new android.graphics.drawable.GradientDrawable();
+						
+						imageBackground.setColor(0xFF222222);
+						imageBackground.setCornerRadius(14 * density);
+						
+						preview.setBackground(imageBackground);
+						preview.setClipToOutline(true);
+						
+						android.widget.FrameLayout.LayoutParams imageParams =
+						new android.widget.FrameLayout.LayoutParams(
+						android.widget.FrameLayout.LayoutParams.MATCH_PARENT,
+						android.widget.FrameLayout.LayoutParams.MATCH_PARENT
+						);
+						
+						imageParams.setMargins(
+						(int)(18 * density),
+						(int)(58 * density),
+						(int)(18 * density),
+						(int)(18 * density)
+						);
+						
+						root.addView(preview, imageParams);
+						
+						// دکمه خروج
+						android.widget.ImageView closeButton =
+						new android.widget.ImageView(imageContext);
+						
+						int closeIconId = imageResources.getIdentifier(
+						"icon_cancel_round",
+						"drawable",
+						imageContext.getPackageName()
+						);
+						
+						if (closeIconId != 0) {
+							
+							closeButton.setImageResource(closeIconId);
+						}
+						
+						closeButton.setScaleType(
+						android.widget.ImageView.ScaleType.FIT_CENTER
+						);
+						
+						closeButton.setPadding(
+						(int)(5 * density),
+						(int)(5 * density),
+						(int)(5 * density),
+						(int)(5 * density)
+						);
+						
+						android.widget.FrameLayout.LayoutParams closeParams =
+						new android.widget.FrameLayout.LayoutParams(
+						(int)(42 * density),
+						(int)(42 * density),
+						android.view.Gravity.TOP |
+						android.view.Gravity.RIGHT
+						);
+						
+						closeParams.setMargins(
+						0,
+						(int)(10 * density),
+						(int)(10 * density),
+						0
+						);
+						
+						root.addView(closeButton, closeParams);
+						
+						closeButton.setOnClickListener(
+						new android.view.View.OnClickListener() {
+							
+							@Override
+							public void onClick(android.view.View view) {
+								dialog.dismiss();
+							}
+						}
+						);
+						
+						dialog.setContentView(root);
+						dialog.setCancelable(true);
+						dialog.setCanceledOnTouchOutside(true);
+						
+						dialog.show();
+						
+						android.view.Window window = dialog.getWindow();
+						
+						if (window != null) {
+							
+							window.setBackgroundDrawable(
+							new android.graphics.drawable.ColorDrawable(
+							0xFF111111
+							)
+							);
+							
+							window.addFlags(
+							android.view.WindowManager.LayoutParams.FLAG_DIM_BEHIND
+							);
+							
+							android.view.WindowManager.LayoutParams params =
+							window.getAttributes();
+							
+							params.dimAmount = 0.85f;
+							
+							window.setAttributes(params);
+							
+							int screenWidth =
+							imageResources.getDisplayMetrics().widthPixels;
+							
+							int screenHeight =
+							imageResources.getDisplayMetrics().heightPixels;
+							
+							window.setLayout(
+							screenWidth - (int)(32 * density),
+							screenHeight - (int)(80 * density)
+							);
+						}
+					}
+				},
+				imagePosition,
+				imagePosition + 1,
+				android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+				);
+				
+				// ----------------------------------
+				// 8. دانلود غیرهم‌زمان تصویر
+				// ----------------------------------
+				
+				new android.os.AsyncTask<String, Void, android.graphics.Bitmap>() {
+					
+					@Override
+					protected android.graphics.Bitmap doInBackground(String... urls) {
+						
+						java.net.HttpURLConnection connection = null;
+						java.io.InputStream input = null;
+						
+						try {
+							
+							java.net.URL url = new java.net.URL(urls[0]);
+							
+							connection = (java.net.HttpURLConnection)
+							url.openConnection();
+							
+							connection.setConnectTimeout(15000);
+							connection.setReadTimeout(20000);
+							connection.setInstanceFollowRedirects(true);
+							connection.setRequestMethod("GET");
+							
+							connection.connect();
+							
+							if (connection.getResponseCode() != 200) {
+								return null;
+							}
+							
+							input = connection.getInputStream();
+							
+							return android.graphics.BitmapFactory.decodeStream(input);
+							
+						} catch (Exception e) {
+							
+							return null;
+							
+						} finally {
+							
+							try {
+								if (input != null) input.close();
+							} catch (Exception e) {}
+							
+							if (connection != null) {
+								connection.disconnect();
+							}
+						}
+					}
+					
+					@Override
+					protected void onPostExecute(android.graphics.Bitmap bitmap) {
+						
+						if (bitmap == null) return;
+						
+						if (noteView.getTag() != renderToken) return;
+						
+						imageHolder[0] = bitmap;
+						
+						// ساخت تصویر مربعی با برش مرکزی
+						android.graphics.Bitmap roundedBitmap =
+						android.graphics.Bitmap.createBitmap(
+						thumbSize,
+						thumbSize,
+						android.graphics.Bitmap.Config.ARGB_8888
+						);
+						
+						android.graphics.Canvas canvas =
+						new android.graphics.Canvas(roundedBitmap);
+						
+						android.graphics.BitmapShader shader =
+						new android.graphics.BitmapShader(
+						bitmap,
+						android.graphics.Shader.TileMode.CLAMP,
+						android.graphics.Shader.TileMode.CLAMP
+						);
+						
+						float scale = Math.max(
+						thumbSize / (float) bitmap.getWidth(),
+						thumbSize / (float) bitmap.getHeight()
+						);
+						
+						float dx =
+						(thumbSize - bitmap.getWidth() * scale) / 2f;
+						
+						float dy =
+						(thumbSize - bitmap.getHeight() * scale) / 2f;
+						
+						android.graphics.Matrix matrix =
+						new android.graphics.Matrix();
+						
+						matrix.setScale(scale, scale);
+						matrix.postTranslate(dx, dy);
+						
+						shader.setLocalMatrix(matrix);
+						
+						android.graphics.Paint paint =
+						new android.graphics.Paint(
+						android.graphics.Paint.ANTI_ALIAS_FLAG
+						);
+						
+						paint.setShader(shader);
+						
+						android.graphics.RectF rect =
+						new android.graphics.RectF(
+						0,
+						0,
+						thumbSize,
+						thumbSize
+						);
+						
+						canvas.drawRoundRect(
+						rect,
+						8 * density,
+						8 * density,
+						paint
+						);
+						
+						// تبدیل به Drawable
+						android.graphics.drawable.BitmapDrawable drawable =
+						new android.graphics.drawable.BitmapDrawable(
+						imageResources,
+						roundedBitmap
+						);
+						
+						drawable.setBounds(
+						0,
+						0,
+						thumbSize,
+						thumbSize
+						);
+						
+						// جایگزینی تصویر موقت
+						styledText.removeSpan(spanHolder[0]);
+						
+						spanHolder[0] = new android.text.style.ImageSpan(
+						drawable,
+						imageUrl,
+						android.text.style.ImageSpan.ALIGN_BASELINE
+						);
+						
+						styledText.setSpan(
+						spanHolder[0],
+						imagePosition,
+						imagePosition + 1,
+						android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+						);
+						
+						noteView.setText(
+						styledText,
+						android.widget.TextView.BufferType.SPANNABLE
+						);
+					}
+					
+				}.execute(imageUrl);
+			}
+			
+			// ----------------------------------
+			// 9. نمایش متن پردازش‌شده
+			// ----------------------------------
+			
+			noteView.setText(
+			styledText,
+			android.widget.TextView.BufferType.SPANNABLE
+			);
+			
+		} else {
+			binding.vscroll1.setBackgroundColor(0xFF10162C);
+			binding.linear3.setBackground(new GradientDrawable() { public GradientDrawable getIns(int a, int b, int c, int d) { this.setCornerRadius(a); this.setStroke(b, c); this.setColor(d); return this; } }.getIns((int)35, (int)2, 0xFF526586, Color.TRANSPARENT));
+			binding.textview1.setTextColor(0xFFFFFFFF);
+			binding.textview2.setBackground(new GradientDrawable() { public GradientDrawable getIns(int a, int b, int c, int d) { this.setCornerRadius(a); this.setStroke(b, c); this.setColor(d); return this; } }.getIns((int)25, (int)1, 0xFF363853, 0xFF1F1E1F));
+			binding.textview6.setBackground(new GradientDrawable() { public GradientDrawable getIns(int a, int b, int c, int d) { this.setCornerRadius(a); this.setStroke(b, c); this.setColor(d); return this; } }.getIns((int)25, (int)1, 0xFF363853, 0xFF1F1E1F));
+			binding.textview2.setTextColor(0xFFE0E0E0);
+			binding.textview6.setTextColor(0xFFE0E0E0);
+			binding.textview3.setTextColor(0xFFEEEEEE);
+			binding.textview5.setTextColor(0xFFEEEEEE);
+			
+			final android.widget.TextView noteView = binding.textview5;
+			final float density = getResources().getDisplayMetrics().density;
+			final android.content.Context imageContext = noteView.getContext();
+			final android.content.res.Resources imageResources = imageContext.getResources();
+			
+			// ----------------------------------
+			// 1. تنظیم رنگ‌ها
+			// ----------------------------------
+			
+			final int englishColor = 0xFFFFFFFF;
+			final int englishShadow = 0xFF101010;
+			final int noteBackground = 0xFF263B5C;
+			final int noteTextColor = 0xFF80BFFF;
+			
+			final String noteText = noteView.getText().toString();
+			
+			final android.text.SpannableStringBuilder styledText =
+			new android.text.SpannableStringBuilder(noteText);
+			
+			// شناسه پردازش برای جلوگیری از اشتباه در بازیافت آیتم‌ها
+			final Object renderToken = new Object();
+			noteView.setTag(renderToken);
+			
+			// ----------------------------------
+			// 2. برجسته‌سازی کلمات انگلیسی
+			// ----------------------------------
+			
+			java.util.regex.Matcher englishMatcher =
+			java.util.regex.Pattern.compile(
+			"[A-Za-z]+(?:['’-][A-Za-z]+)*"
+			).matcher(styledText);
+			
+			while (englishMatcher.find()) {
+				
+				styledText.setSpan(
+				new android.text.style.CharacterStyle() {
+					
+					@Override
+					public void updateDrawState(android.text.TextPaint paint) {
+						
+						paint.setColor(englishColor);
+						paint.setFakeBoldText(true);
+						paint.setStyle(android.graphics.Paint.Style.FILL_AND_STROKE);
+						paint.setStrokeWidth(0.65f * density);
+						
+						paint.setShadowLayer(
+						1.2f * density,
+						0f,
+						0f,
+						englishShadow
+						);
+					}
+				},
+				englishMatcher.start(),
+				englishMatcher.end(),
+				android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+				);
+			}
+			
+			// ----------------------------------
+			// 3. ساخت کادر نکته‌ها
+			// ----------------------------------
+			
+			int searchIndex = 0;
+			
+			while (searchIndex < styledText.length()) {
+				
+				int start = styledText.toString().indexOf("نکته:", searchIndex);
+				
+				if (start == -1) break;
+				
+				int end = styledText.toString().indexOf("\n", start);
+				
+				if (end == -1) {
+					end = styledText.length();
+				}
+				
+				styledText.setSpan(
+				new android.text.style.ReplacementSpan() {
+					
+					@Override
+					public int getSize(
+					android.graphics.Paint paint,
+					CharSequence text,
+					int start,
+					int end,
+					android.graphics.Paint.FontMetricsInt fm
+					) {
+						
+						return (int) paint.measureText(text, start, end)
+						+ (int)(20 * density);
+					}
+					
+					@Override
+					public void draw(
+					android.graphics.Canvas canvas,
+					CharSequence text,
+					int start,
+					int end,
+					float x,
+					int top,
+					int y,
+					int bottom,
+					android.graphics.Paint paint
+					) {
+						
+						android.graphics.Paint bg =
+						new android.graphics.Paint(
+						android.graphics.Paint.ANTI_ALIAS_FLAG
+						);
+						
+						bg.setColor(noteBackground);
+						
+						float padH = 10 * density;
+						float padV = 4 * density;
+						
+						float textWidth = paint.measureText(text, start, end);
+						
+						android.graphics.RectF rect =
+						new android.graphics.RectF(
+						x,
+						y + paint.ascent() - padV,
+						x + textWidth + (20 * density),
+						y + paint.descent() + padV
+						);
+						
+						canvas.drawRoundRect(
+						rect,
+						6 * density,
+						6 * density,
+						bg
+						);
+						
+						android.graphics.Paint textPaint =
+						new android.graphics.Paint(paint);
+						
+						textPaint.setColor(noteTextColor);
+						
+						textPaint.setTypeface(
+						android.graphics.Typeface.create(
+						paint.getTypeface(),
+						android.graphics.Typeface.BOLD
+						)
+						);
+						
+						canvas.drawText(
+						text,
+						start,
+						end,
+						x + padH,
+						y,
+						textPaint
+						);
+					}
+				},
+				start,
+				end,
+				android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+				);
+				
+				searchIndex = end;
+			}
+			
+			// ----------------------------------
+			// 4. شناسایی لینک تصاویر
+			// ----------------------------------
+			
+			java.util.ArrayList<String> imageUrls =
+			new java.util.ArrayList<String>();
+			
+			java.util.ArrayList<Integer> imagePositions =
+			new java.util.ArrayList<Integer>();
+			
+			java.util.ArrayList<Integer> originalStarts =
+			new java.util.ArrayList<Integer>();
+			
+			java.util.ArrayList<Integer> originalEnds =
+			new java.util.ArrayList<Integer>();
+			
+			java.util.regex.Matcher urlMatcher =
+			java.util.regex.Pattern.compile("https?://\\S+")
+			.matcher(noteText);
+			
+			while (urlMatcher.find()) {
+				
+				String url = urlMatcher.group();
+				
+				int start = urlMatcher.start();
+				int end = urlMatcher.end();
+				
+				// حذف علائم نگارشی انتهای لینک
+				while (
+				url.length() > 0 &&
+				".,;،؛:!?؟)]}".indexOf(
+				url.charAt(url.length() - 1)
+				) != -1
+				) {
+					
+					url = url.substring(0, url.length() - 1);
+					end--;
+				}
+				
+				if (url.length() > 0) {
+					
+					originalStarts.add(start);
+					originalEnds.add(end);
+					imageUrls.add(url);
+				}
+			}
+			
+			// جایگزینی لینک‌ها با محل تصویر
+			int offset = 0;
+			
+			for (int i = 0; i < imageUrls.size(); i++) {
+				
+				int start = originalStarts.get(i) + offset;
+				int end = originalEnds.get(i) + offset;
+				
+				styledText.replace(start, end, "\uFFFC");
+				
+				imagePositions.add(start);
+				
+				offset += 1 - (
+				originalEnds.get(i) - originalStarts.get(i)
+				);
+			}
+			
+			// ----------------------------------
+			// 5. تنظیم کلیک روی تصاویر
+			// ----------------------------------
+			
+			noteView.setHighlightColor(0x00000000);
+			noteView.setLinksClickable(true);
+			
+			noteView.setMovementMethod(
+			android.text.method.LinkMovementMethod.getInstance()
+			);
+			
+			// ----------------------------------
+			// 6. ایجاد تصاویر و دانلود
+			// ----------------------------------
+			
+			final int thumbSize = (int)(30 * density);
+			
+			for (int i = 0; i < imageUrls.size(); i++) {
+				
+				final String imageUrl = imageUrls.get(i);
+				final int imagePosition = imagePositions.get(i);
+				
+				final android.graphics.Bitmap[] imageHolder =
+				new android.graphics.Bitmap[1];
+				
+				final android.text.style.ImageSpan[] spanHolder =
+				new android.text.style.ImageSpan[1];
+				
+				// تصویر موقت
+				android.graphics.drawable.GradientDrawable placeholder =
+				new android.graphics.drawable.GradientDrawable();
+				
+				placeholder.setColor(0xFF444444);
+				placeholder.setCornerRadius(8 * density);
+				
+				placeholder.setBounds(
+				0,
+				0,
+				thumbSize,
+				thumbSize
+				);
+				
+				spanHolder[0] = new android.text.style.ImageSpan(
+				placeholder,
+				imageUrl,
+				android.text.style.ImageSpan.ALIGN_BASELINE
+				);
+				
+				styledText.setSpan(
+				spanHolder[0],
+				imagePosition,
+				imagePosition + 1,
+				android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+				);
+				
+				// ----------------------------------
+				// 7. کلیک و نمایش تصویر بزرگ
+				// ----------------------------------
+				
+				styledText.setSpan(
+				new android.text.style.ClickableSpan() {
+					
+					@Override
+					public void updateDrawState(android.text.TextPaint ds) {
+						ds.setUnderlineText(false);
+					}
+					
+					@Override
+					public void onClick(android.view.View v) {
+						
+						if (imageHolder[0] == null) return;
+						
+						final android.app.Dialog dialog =
+						new android.app.Dialog(imageContext);
+						
+						android.widget.FrameLayout root =
+						new android.widget.FrameLayout(imageContext);
+						
+						root.setBackgroundColor(0xFF111111);
+						
+						// تصویر اصلی
+						android.widget.ImageView preview =
+						new android.widget.ImageView(imageContext);
+						
+						preview.setImageBitmap(imageHolder[0]);
+						
+						preview.setScaleType(
+						android.widget.ImageView.ScaleType.FIT_CENTER
+						);
+						
+						android.graphics.drawable.GradientDrawable imageBackground =
+						new android.graphics.drawable.GradientDrawable();
+						
+						imageBackground.setColor(0xFF222222);
+						imageBackground.setCornerRadius(14 * density);
+						
+						preview.setBackground(imageBackground);
+						preview.setClipToOutline(true);
+						
+						android.widget.FrameLayout.LayoutParams imageParams =
+						new android.widget.FrameLayout.LayoutParams(
+						android.widget.FrameLayout.LayoutParams.MATCH_PARENT,
+						android.widget.FrameLayout.LayoutParams.MATCH_PARENT
+						);
+						
+						imageParams.setMargins(
+						(int)(18 * density),
+						(int)(58 * density),
+						(int)(18 * density),
+						(int)(18 * density)
+						);
+						
+						root.addView(preview, imageParams);
+						
+						// دکمه خروج
+						android.widget.ImageView closeButton =
+						new android.widget.ImageView(imageContext);
+						
+						int closeIconId = imageResources.getIdentifier(
+						"icon_cancel_round",
+						"drawable",
+						imageContext.getPackageName()
+						);
+						
+						if (closeIconId != 0) {
+							
+							closeButton.setImageResource(closeIconId);
+						}
+						
+						closeButton.setScaleType(
+						android.widget.ImageView.ScaleType.FIT_CENTER
+						);
+						
+						closeButton.setPadding(
+						(int)(5 * density),
+						(int)(5 * density),
+						(int)(5 * density),
+						(int)(5 * density)
+						);
+						
+						android.widget.FrameLayout.LayoutParams closeParams =
+						new android.widget.FrameLayout.LayoutParams(
+						(int)(42 * density),
+						(int)(42 * density),
+						android.view.Gravity.TOP |
+						android.view.Gravity.RIGHT
+						);
+						
+						closeParams.setMargins(
+						0,
+						(int)(10 * density),
+						(int)(10 * density),
+						0
+						);
+						
+						root.addView(closeButton, closeParams);
+						
+						closeButton.setOnClickListener(
+						new android.view.View.OnClickListener() {
+							
+							@Override
+							public void onClick(android.view.View view) {
+								dialog.dismiss();
+							}
+						}
+						);
+						
+						dialog.setContentView(root);
+						dialog.setCancelable(true);
+						dialog.setCanceledOnTouchOutside(true);
+						
+						dialog.show();
+						
+						android.view.Window window = dialog.getWindow();
+						
+						if (window != null) {
+							
+							window.setBackgroundDrawable(
+							new android.graphics.drawable.ColorDrawable(
+							0xFF111111
+							)
+							);
+							
+							window.addFlags(
+							android.view.WindowManager.LayoutParams.FLAG_DIM_BEHIND
+							);
+							
+							android.view.WindowManager.LayoutParams params =
+							window.getAttributes();
+							
+							params.dimAmount = 0.85f;
+							
+							window.setAttributes(params);
+							
+							int screenWidth =
+							imageResources.getDisplayMetrics().widthPixels;
+							
+							int screenHeight =
+							imageResources.getDisplayMetrics().heightPixels;
+							
+							window.setLayout(
+							screenWidth - (int)(32 * density),
+							screenHeight - (int)(80 * density)
+							);
+						}
+					}
+				},
+				imagePosition,
+				imagePosition + 1,
+				android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+				);
+				
+				// ----------------------------------
+				// 8. دانلود غیرهم‌زمان تصویر
+				// ----------------------------------
+				
+				new android.os.AsyncTask<String, Void, android.graphics.Bitmap>() {
+					
+					@Override
+					protected android.graphics.Bitmap doInBackground(String... urls) {
+						
+						java.net.HttpURLConnection connection = null;
+						java.io.InputStream input = null;
+						
+						try {
+							
+							java.net.URL url = new java.net.URL(urls[0]);
+							
+							connection = (java.net.HttpURLConnection)
+							url.openConnection();
+							
+							connection.setConnectTimeout(15000);
+							connection.setReadTimeout(20000);
+							connection.setInstanceFollowRedirects(true);
+							connection.setRequestMethod("GET");
+							
+							connection.connect();
+							
+							if (connection.getResponseCode() != 200) {
+								return null;
+							}
+							
+							input = connection.getInputStream();
+							
+							return android.graphics.BitmapFactory.decodeStream(input);
+							
+						} catch (Exception e) {
+							
+							return null;
+							
+						} finally {
+							
+							try {
+								if (input != null) input.close();
+							} catch (Exception e) {}
+							
+							if (connection != null) {
+								connection.disconnect();
+							}
+						}
+					}
+					
+					@Override
+					protected void onPostExecute(android.graphics.Bitmap bitmap) {
+						
+						if (bitmap == null) return;
+						
+						if (noteView.getTag() != renderToken) return;
+						
+						imageHolder[0] = bitmap;
+						
+						// ساخت تصویر مربعی با برش مرکزی
+						android.graphics.Bitmap roundedBitmap =
+						android.graphics.Bitmap.createBitmap(
+						thumbSize,
+						thumbSize,
+						android.graphics.Bitmap.Config.ARGB_8888
+						);
+						
+						android.graphics.Canvas canvas =
+						new android.graphics.Canvas(roundedBitmap);
+						
+						android.graphics.BitmapShader shader =
+						new android.graphics.BitmapShader(
+						bitmap,
+						android.graphics.Shader.TileMode.CLAMP,
+						android.graphics.Shader.TileMode.CLAMP
+						);
+						
+						float scale = Math.max(
+						thumbSize / (float) bitmap.getWidth(),
+						thumbSize / (float) bitmap.getHeight()
+						);
+						
+						float dx =
+						(thumbSize - bitmap.getWidth() * scale) / 2f;
+						
+						float dy =
+						(thumbSize - bitmap.getHeight() * scale) / 2f;
+						
+						android.graphics.Matrix matrix =
+						new android.graphics.Matrix();
+						
+						matrix.setScale(scale, scale);
+						matrix.postTranslate(dx, dy);
+						
+						shader.setLocalMatrix(matrix);
+						
+						android.graphics.Paint paint =
+						new android.graphics.Paint(
+						android.graphics.Paint.ANTI_ALIAS_FLAG
+						);
+						
+						paint.setShader(shader);
+						
+						android.graphics.RectF rect =
+						new android.graphics.RectF(
+						0,
+						0,
+						thumbSize,
+						thumbSize
+						);
+						
+						canvas.drawRoundRect(
+						rect,
+						8 * density,
+						8 * density,
+						paint
+						);
+						
+						// تبدیل به Drawable
+						android.graphics.drawable.BitmapDrawable drawable =
+						new android.graphics.drawable.BitmapDrawable(
+						imageResources,
+						roundedBitmap
+						);
+						
+						drawable.setBounds(
+						0,
+						0,
+						thumbSize,
+						thumbSize
+						);
+						
+						// جایگزینی تصویر موقت
+						styledText.removeSpan(spanHolder[0]);
+						
+						spanHolder[0] = new android.text.style.ImageSpan(
+						drawable,
+						imageUrl,
+						android.text.style.ImageSpan.ALIGN_BASELINE
+						);
+						
+						styledText.setSpan(
+						spanHolder[0],
+						imagePosition,
+						imagePosition + 1,
+						android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+						);
+						
+						noteView.setText(
+						styledText,
+						android.widget.TextView.BufferType.SPANNABLE
+						);
+					}
+					
+				}.execute(imageUrl);
+			}
+			
+			// ----------------------------------
+			// 9. نمایش متن پردازش‌شده
+			// ----------------------------------
+			
+			noteView.setText(
+			styledText,
+			android.widget.TextView.BufferType.SPANNABLE
+			);
+			
+		}
+		binding.imageview1.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View _view) {
+				s = true;
+				sv.edit().remove(_data.get((int)_position).get("subject").toString()).commit();
+			}
+		});
+	} else {
+		
+	}
+} else {
+	binding.linear1.setVisibility(View.VISIBLE);
+	binding.textview1.setText(_data.get((int)_position).get("subject").toString());
+	binding.textview3.setText(_data.get((int)_position).get("Introduction").toString());
+	binding.textview5.setText(_data.get((int)_position).get("steps").toString());
+	binding.textview1.setTypeface(Typeface.createFromAsset(getAssets(),"fonts/lvery_bold.ttf"), 0);
+	binding.textview2.setTypeface(Typeface.createFromAsset(getAssets(),"fonts/bold.ttf"), 0);
+	binding.textview6.setTypeface(Typeface.createFromAsset(getAssets(),"fonts/bold.ttf"), 0);
+	binding.textview5.setTypeface(Typeface.createFromAsset(getAssets(),"fonts/normal.ttf"), 1);
+	binding.textview3.setTypeface(Typeface.createFromAsset(getAssets(),"fonts/normal.ttf"), 1);
+	if (sv.getString(_data.get((int)_position).get("subject").toString(), "").equals("save")) {
+		binding.imageview1.setImageResource(R.drawable.icon_bookmark_round);
+	} else {
+		binding.imageview1.setImageResource(R.drawable.icon_bookmark_border_twotone2);
+	}
+	if (mode.getString("mode", "").equals("light")) {
+		binding.vscroll1.setBackgroundColor(0xFFF1F1F1);
+		binding.linear3.setBackground(new GradientDrawable() { public GradientDrawable getIns(int a, int b, int c, int d) { this.setCornerRadius(a); this.setStroke(b, c); this.setColor(d); return this; } }.getIns((int)35, (int)2, 0xFF9E9E9E, Color.TRANSPARENT));
+		binding.textview1.setTextColor(0xFF000000);
+		binding.textview2.setBackground(new GradientDrawable() { public GradientDrawable getIns(int a, int b, int c, int d) { this.setCornerRadius(a); this.setStroke(b, c); this.setColor(d); return this; } }.getIns((int)25, (int)1, 0xFFBDBDBD, 0xFFEEEEEE));
+		binding.textview6.setBackground(new GradientDrawable() { public GradientDrawable getIns(int a, int b, int c, int d) { this.setCornerRadius(a); this.setStroke(b, c); this.setColor(d); return this; } }.getIns((int)25, (int)1, 0xFFBDBDBD, 0xFFEEEEEE));
+		binding.textview2.setTextColor(0xFF616161);
+		binding.textview6.setTextColor(0xFF616161);
+		binding.textview3.setTextColor(0xFF424242);
+		binding.textview5.setTextColor(0xFF424242);
+		
+		final android.widget.TextView noteView = binding.textview5;
+		final float density = getResources().getDisplayMetrics().density;
+		final android.content.Context imageContext = noteView.getContext();
+		final android.content.res.Resources imageResources = imageContext.getResources();
+		
+		// ----------------------------------
+		// 1. تنظیم رنگ‌ها
+		// ----------------------------------
+		
+		final int englishColor = 0xFF000000;
+		final int englishShadow = 0xFFB0B0B0;
+		final int noteBackground = 0xFFE5F2FF;
+		final int noteTextColor = 0xFF0879DB;
+		
+		final String noteText = noteView.getText().toString();
+		
+		final android.text.SpannableStringBuilder styledText =
+		new android.text.SpannableStringBuilder(noteText);
+		
+		// شناسه پردازش برای جلوگیری از اشتباه در بازیافت آیتم‌ها
+		final Object renderToken = new Object();
+		noteView.setTag(renderToken);
+		
+		// ----------------------------------
+		// 2. برجسته‌سازی کلمات انگلیسی
+		// ----------------------------------
+		
+		java.util.regex.Matcher englishMatcher =
+		java.util.regex.Pattern.compile(
+		"[A-Za-z]+(?:['’-][A-Za-z]+)*"
+		).matcher(styledText);
+		
+		while (englishMatcher.find()) {
+			
+			styledText.setSpan(
+			new android.text.style.CharacterStyle() {
+				
+				@Override
+				public void updateDrawState(android.text.TextPaint paint) {
+					
+					paint.setColor(englishColor);
+					paint.setFakeBoldText(true);
+					paint.setStyle(android.graphics.Paint.Style.FILL_AND_STROKE);
+					paint.setStrokeWidth(0.65f * density);
+					
+					paint.setShadowLayer(
+					1.2f * density,
+					0f,
+					0f,
+					englishShadow
+					);
+				}
+			},
+			englishMatcher.start(),
+			englishMatcher.end(),
+			android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+			);
+		}
+		
+		// ----------------------------------
+		// 3. ساخت کادر نکته‌ها
+		// ----------------------------------
+		
+		int searchIndex = 0;
+		
+		while (searchIndex < styledText.length()) {
+			
+			int start = styledText.toString().indexOf("نکته:", searchIndex);
+			
+			if (start == -1) break;
+			
+			int end = styledText.toString().indexOf("\n", start);
+			
+			if (end == -1) {
+				end = styledText.length();
+			}
+			
+			styledText.setSpan(
+			new android.text.style.ReplacementSpan() {
+				
+				@Override
+				public int getSize(
+				android.graphics.Paint paint,
+				CharSequence text,
+				int start,
+				int end,
+				android.graphics.Paint.FontMetricsInt fm
+				) {
+					
+					return (int) paint.measureText(text, start, end)
+					+ (int)(20 * density);
+				}
+				
+				@Override
+				public void draw(
+				android.graphics.Canvas canvas,
+				CharSequence text,
+				int start,
+				int end,
+				float x,
+				int top,
+				int y,
+				int bottom,
+				android.graphics.Paint paint
+				) {
+					
+					android.graphics.Paint bg =
+					new android.graphics.Paint(
+					android.graphics.Paint.ANTI_ALIAS_FLAG
+					);
+					
+					bg.setColor(noteBackground);
+					
+					float padH = 10 * density;
+					float padV = 4 * density;
+					
+					float textWidth = paint.measureText(text, start, end);
+					
+					android.graphics.RectF rect =
+					new android.graphics.RectF(
+					x,
+					y + paint.ascent() - padV,
+					x + textWidth + (20 * density),
+					y + paint.descent() + padV
+					);
+					
+					canvas.drawRoundRect(
+					rect,
+					6 * density,
+					6 * density,
+					bg
+					);
+					
+					android.graphics.Paint textPaint =
+					new android.graphics.Paint(paint);
+					
+					textPaint.setColor(noteTextColor);
+					
+					textPaint.setTypeface(
+					android.graphics.Typeface.create(
+					paint.getTypeface(),
+					android.graphics.Typeface.BOLD
+					)
+					);
+					
+					canvas.drawText(
+					text,
+					start,
+					end,
+					x + padH,
+					y,
+					textPaint
+					);
+				}
+			},
+			start,
+			end,
+			android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+			);
+			
+			searchIndex = end;
+		}
+		
+		// ----------------------------------
+		// 4. شناسایی لینک تصاویر
+		// ----------------------------------
+		
+		java.util.ArrayList<String> imageUrls =
+		new java.util.ArrayList<String>();
+		
+		java.util.ArrayList<Integer> imagePositions =
+		new java.util.ArrayList<Integer>();
+		
+		java.util.ArrayList<Integer> originalStarts =
+		new java.util.ArrayList<Integer>();
+		
+		java.util.ArrayList<Integer> originalEnds =
+		new java.util.ArrayList<Integer>();
+		
+		java.util.regex.Matcher urlMatcher =
+		java.util.regex.Pattern.compile("https?://\\S+")
+		.matcher(noteText);
+		
+		while (urlMatcher.find()) {
+			
+			String url = urlMatcher.group();
+			
+			int start = urlMatcher.start();
+			int end = urlMatcher.end();
+			
+			// حذف علائم نگارشی انتهای لینک
+			while (
+			url.length() > 0 &&
+			".,;،؛:!?؟)]}".indexOf(
+			url.charAt(url.length() - 1)
+			) != -1
+			) {
+				
+				url = url.substring(0, url.length() - 1);
+				end--;
+			}
+			
+			if (url.length() > 0) {
+				
+				originalStarts.add(start);
+				originalEnds.add(end);
+				imageUrls.add(url);
+			}
+		}
+		
+		// جایگزینی لینک‌ها با محل تصویر
+		int offset = 0;
+		
+		for (int i = 0; i < imageUrls.size(); i++) {
+			
+			int start = originalStarts.get(i) + offset;
+			int end = originalEnds.get(i) + offset;
+			
+			styledText.replace(start, end, "\uFFFC");
+			
+			imagePositions.add(start);
+			
+			offset += 1 - (
+			originalEnds.get(i) - originalStarts.get(i)
+			);
+		}
+		
+		// ----------------------------------
+		// 5. تنظیم کلیک روی تصاویر
+		// ----------------------------------
+		
+		noteView.setHighlightColor(0x00000000);
+		noteView.setLinksClickable(true);
+		
+		noteView.setMovementMethod(
+		android.text.method.LinkMovementMethod.getInstance()
+		);
+		
+		// ----------------------------------
+		// 6. ایجاد تصاویر و دانلود
+		// ----------------------------------
+		
+		final int thumbSize = (int)(30 * density);
+		
+		for (int i = 0; i < imageUrls.size(); i++) {
+			
+			final String imageUrl = imageUrls.get(i);
+			final int imagePosition = imagePositions.get(i);
+			
+			final android.graphics.Bitmap[] imageHolder =
+			new android.graphics.Bitmap[1];
+			
+			final android.text.style.ImageSpan[] spanHolder =
+			new android.text.style.ImageSpan[1];
+			
+			// تصویر موقت
+			android.graphics.drawable.GradientDrawable placeholder =
+			new android.graphics.drawable.GradientDrawable();
+			
+			placeholder.setColor(0xFF444444);
+			placeholder.setCornerRadius(8 * density);
+			
+			placeholder.setBounds(
+			0,
+			0,
+			thumbSize,
+			thumbSize
+			);
+			
+			spanHolder[0] = new android.text.style.ImageSpan(
+			placeholder,
+			imageUrl,
+			android.text.style.ImageSpan.ALIGN_BASELINE
+			);
+			
+			styledText.setSpan(
+			spanHolder[0],
+			imagePosition,
+			imagePosition + 1,
+			android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+			);
+			
+			// ----------------------------------
+			// 7. کلیک و نمایش تصویر بزرگ
+			// ----------------------------------
+			
+			styledText.setSpan(
+			new android.text.style.ClickableSpan() {
+				
+				@Override
+				public void updateDrawState(android.text.TextPaint ds) {
+					ds.setUnderlineText(false);
+				}
+				
+				@Override
+				public void onClick(android.view.View v) {
+					
+					if (imageHolder[0] == null) return;
+					
+					final android.app.Dialog dialog =
+					new android.app.Dialog(imageContext);
+					
+					android.widget.FrameLayout root =
+					new android.widget.FrameLayout(imageContext);
+					
+					root.setBackgroundColor(0xFF111111);
+					
+					// تصویر اصلی
+					android.widget.ImageView preview =
+					new android.widget.ImageView(imageContext);
+					
+					preview.setImageBitmap(imageHolder[0]);
+					
+					preview.setScaleType(
+					android.widget.ImageView.ScaleType.FIT_CENTER
+					);
+					
+					android.graphics.drawable.GradientDrawable imageBackground =
+					new android.graphics.drawable.GradientDrawable();
+					
+					imageBackground.setColor(0xFF222222);
+					imageBackground.setCornerRadius(14 * density);
+					
+					preview.setBackground(imageBackground);
+					preview.setClipToOutline(true);
+					
+					android.widget.FrameLayout.LayoutParams imageParams =
+					new android.widget.FrameLayout.LayoutParams(
+					android.widget.FrameLayout.LayoutParams.MATCH_PARENT,
+					android.widget.FrameLayout.LayoutParams.MATCH_PARENT
+					);
+					
+					imageParams.setMargins(
+					(int)(18 * density),
+					(int)(58 * density),
+					(int)(18 * density),
+					(int)(18 * density)
+					);
+					
+					root.addView(preview, imageParams);
+					
+					// دکمه خروج
+					android.widget.ImageView closeButton =
+					new android.widget.ImageView(imageContext);
+					
+					int closeIconId = imageResources.getIdentifier(
+					"icon_cancel_round",
+					"drawable",
+					imageContext.getPackageName()
+					);
+					
+					if (closeIconId != 0) {
+						
+						closeButton.setImageResource(closeIconId);
+					}
+					
+					closeButton.setScaleType(
+					android.widget.ImageView.ScaleType.FIT_CENTER
+					);
+					
+					closeButton.setPadding(
+					(int)(5 * density),
+					(int)(5 * density),
+					(int)(5 * density),
+					(int)(5 * density)
+					);
+					
+					android.widget.FrameLayout.LayoutParams closeParams =
+					new android.widget.FrameLayout.LayoutParams(
+					(int)(42 * density),
+					(int)(42 * density),
+					android.view.Gravity.TOP |
+					android.view.Gravity.RIGHT
+					);
+					
+					closeParams.setMargins(
+					0,
+					(int)(10 * density),
+					(int)(10 * density),
+					0
+					);
+					
+					root.addView(closeButton, closeParams);
+					
+					closeButton.setOnClickListener(
+					new android.view.View.OnClickListener() {
+						
+						@Override
+						public void onClick(android.view.View view) {
+							dialog.dismiss();
+						}
+					}
+					);
+					
+					dialog.setContentView(root);
+					dialog.setCancelable(true);
+					dialog.setCanceledOnTouchOutside(true);
+					
+					dialog.show();
+					
+					android.view.Window window = dialog.getWindow();
+					
+					if (window != null) {
+						
+						window.setBackgroundDrawable(
+						new android.graphics.drawable.ColorDrawable(
+						0xFF111111
+						)
+						);
+						
+						window.addFlags(
+						android.view.WindowManager.LayoutParams.FLAG_DIM_BEHIND
+						);
+						
+						android.view.WindowManager.LayoutParams params =
+						window.getAttributes();
+						
+						params.dimAmount = 0.85f;
+						
+						window.setAttributes(params);
+						
+						int screenWidth =
+						imageResources.getDisplayMetrics().widthPixels;
+						
+						int screenHeight =
+						imageResources.getDisplayMetrics().heightPixels;
+						
+						window.setLayout(
+						screenWidth - (int)(32 * density),
+						screenHeight - (int)(80 * density)
+						);
+					}
+				}
+			},
+			imagePosition,
+			imagePosition + 1,
+			android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+			);
+			
+			// ----------------------------------
+			// 8. دانلود غیرهم‌زمان تصویر
+			// ----------------------------------
+			
+			new android.os.AsyncTask<String, Void, android.graphics.Bitmap>() {
+				
+				@Override
+				protected android.graphics.Bitmap doInBackground(String... urls) {
+					
+					java.net.HttpURLConnection connection = null;
+					java.io.InputStream input = null;
+					
+					try {
+						
+						java.net.URL url = new java.net.URL(urls[0]);
+						
+						connection = (java.net.HttpURLConnection)
+						url.openConnection();
+						
+						connection.setConnectTimeout(15000);
+						connection.setReadTimeout(20000);
+						connection.setInstanceFollowRedirects(true);
+						connection.setRequestMethod("GET");
+						
+						connection.connect();
+						
+						if (connection.getResponseCode() != 200) {
+							return null;
+						}
+						
+						input = connection.getInputStream();
+						
+						return android.graphics.BitmapFactory.decodeStream(input);
+						
+					} catch (Exception e) {
+						
+						return null;
+						
+					} finally {
+						
+						try {
+							if (input != null) input.close();
+						} catch (Exception e) {}
+						
+						if (connection != null) {
+							connection.disconnect();
+						}
+					}
+				}
+				
+				@Override
+				protected void onPostExecute(android.graphics.Bitmap bitmap) {
+					
+					if (bitmap == null) return;
+					
+					if (noteView.getTag() != renderToken) return;
+					
+					imageHolder[0] = bitmap;
+					
+					// ساخت تصویر مربعی با برش مرکزی
+					android.graphics.Bitmap roundedBitmap =
+					android.graphics.Bitmap.createBitmap(
+					thumbSize,
+					thumbSize,
+					android.graphics.Bitmap.Config.ARGB_8888
+					);
+					
+					android.graphics.Canvas canvas =
+					new android.graphics.Canvas(roundedBitmap);
+					
+					android.graphics.BitmapShader shader =
+					new android.graphics.BitmapShader(
+					bitmap,
+					android.graphics.Shader.TileMode.CLAMP,
+					android.graphics.Shader.TileMode.CLAMP
+					);
+					
+					float scale = Math.max(
+					thumbSize / (float) bitmap.getWidth(),
+					thumbSize / (float) bitmap.getHeight()
+					);
+					
+					float dx =
+					(thumbSize - bitmap.getWidth() * scale) / 2f;
+					
+					float dy =
+					(thumbSize - bitmap.getHeight() * scale) / 2f;
+					
+					android.graphics.Matrix matrix =
+					new android.graphics.Matrix();
+					
+					matrix.setScale(scale, scale);
+					matrix.postTranslate(dx, dy);
+					
+					shader.setLocalMatrix(matrix);
+					
+					android.graphics.Paint paint =
+					new android.graphics.Paint(
+					android.graphics.Paint.ANTI_ALIAS_FLAG
+					);
+					
+					paint.setShader(shader);
+					
+					android.graphics.RectF rect =
+					new android.graphics.RectF(
+					0,
+					0,
+					thumbSize,
+					thumbSize
+					);
+					
+					canvas.drawRoundRect(
+					rect,
+					8 * density,
+					8 * density,
+					paint
+					);
+					
+					// تبدیل به Drawable
+					android.graphics.drawable.BitmapDrawable drawable =
+					new android.graphics.drawable.BitmapDrawable(
+					imageResources,
+					roundedBitmap
+					);
+					
+					drawable.setBounds(
+					0,
+					0,
+					thumbSize,
+					thumbSize
+					);
+					
+					// جایگزینی تصویر موقت
+					styledText.removeSpan(spanHolder[0]);
+					
+					spanHolder[0] = new android.text.style.ImageSpan(
+					drawable,
+					imageUrl,
+					android.text.style.ImageSpan.ALIGN_BASELINE
+					);
+					
+					styledText.setSpan(
+					spanHolder[0],
+					imagePosition,
+					imagePosition + 1,
+					android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+					);
+					
+					noteView.setText(
+					styledText,
+					android.widget.TextView.BufferType.SPANNABLE
+					);
+				}
+				
+			}.execute(imageUrl);
+		}
+		
+		// ----------------------------------
+		// 9. نمایش متن پردازش‌شده
+		// ----------------------------------
+		
+		noteView.setText(
+		styledText,
+		android.widget.TextView.BufferType.SPANNABLE
+		);
+		
+	} else {
+		binding.vscroll1.setBackgroundColor(0xFF10162C);
+		binding.linear3.setBackground(new GradientDrawable() { public GradientDrawable getIns(int a, int b, int c, int d) { this.setCornerRadius(a); this.setStroke(b, c); this.setColor(d); return this; } }.getIns((int)35, (int)2, 0xFF526586, Color.TRANSPARENT));
+		binding.textview1.setTextColor(0xFFFFFFFF);
+		binding.textview2.setBackground(new GradientDrawable() { public GradientDrawable getIns(int a, int b, int c, int d) { this.setCornerRadius(a); this.setStroke(b, c); this.setColor(d); return this; } }.getIns((int)25, (int)1, 0xFF363853, 0xFF1F1E1F));
+		binding.textview6.setBackground(new GradientDrawable() { public GradientDrawable getIns(int a, int b, int c, int d) { this.setCornerRadius(a); this.setStroke(b, c); this.setColor(d); return this; } }.getIns((int)25, (int)1, 0xFF363853, 0xFF1F1E1F));
+		binding.textview2.setTextColor(0xFFE0E0E0);
+		binding.textview6.setTextColor(0xFFE0E0E0);
+		binding.textview3.setTextColor(0xFFEEEEEE);
+		binding.textview5.setTextColor(0xFFEEEEEE);
+		
+		final android.widget.TextView noteView = binding.textview5;
+		final float density = getResources().getDisplayMetrics().density;
+		final android.content.Context imageContext = noteView.getContext();
+		final android.content.res.Resources imageResources = imageContext.getResources();
+		
+		// ----------------------------------
+		// 1. تنظیم رنگ‌ها
+		// ----------------------------------
+		
+		final int englishColor = 0xFFFFFFFF;
+		final int englishShadow = 0xFF101010;
+		final int noteBackground = 0xFF263B5C;
+		final int noteTextColor = 0xFF80BFFF;
+		
+		final String noteText = noteView.getText().toString();
+		
+		final android.text.SpannableStringBuilder styledText =
+		new android.text.SpannableStringBuilder(noteText);
+		
+		// شناسه پردازش برای جلوگیری از اشتباه در بازیافت آیتم‌ها
+		final Object renderToken = new Object();
+		noteView.setTag(renderToken);
+		
+		// ----------------------------------
+		// 2. برجسته‌سازی کلمات انگلیسی
+		// ----------------------------------
+		
+		java.util.regex.Matcher englishMatcher =
+		java.util.regex.Pattern.compile(
+		"[A-Za-z]+(?:['’-][A-Za-z]+)*"
+		).matcher(styledText);
+		
+		while (englishMatcher.find()) {
+			
+			styledText.setSpan(
+			new android.text.style.CharacterStyle() {
+				
+				@Override
+				public void updateDrawState(android.text.TextPaint paint) {
+					
+					paint.setColor(englishColor);
+					paint.setFakeBoldText(true);
+					paint.setStyle(android.graphics.Paint.Style.FILL_AND_STROKE);
+					paint.setStrokeWidth(0.65f * density);
+					
+					paint.setShadowLayer(
+					1.2f * density,
+					0f,
+					0f,
+					englishShadow
+					);
+				}
+			},
+			englishMatcher.start(),
+			englishMatcher.end(),
+			android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+			);
+		}
+		
+		// ----------------------------------
+		// 3. ساخت کادر نکته‌ها
+		// ----------------------------------
+		
+		int searchIndex = 0;
+		
+		while (searchIndex < styledText.length()) {
+			
+			int start = styledText.toString().indexOf("نکته:", searchIndex);
+			
+			if (start == -1) break;
+			
+			int end = styledText.toString().indexOf("\n", start);
+			
+			if (end == -1) {
+				end = styledText.length();
+			}
+			
+			styledText.setSpan(
+			new android.text.style.ReplacementSpan() {
+				
+				@Override
+				public int getSize(
+				android.graphics.Paint paint,
+				CharSequence text,
+				int start,
+				int end,
+				android.graphics.Paint.FontMetricsInt fm
+				) {
+					
+					return (int) paint.measureText(text, start, end)
+					+ (int)(20 * density);
+				}
+				
+				@Override
+				public void draw(
+				android.graphics.Canvas canvas,
+				CharSequence text,
+				int start,
+				int end,
+				float x,
+				int top,
+				int y,
+				int bottom,
+				android.graphics.Paint paint
+				) {
+					
+					android.graphics.Paint bg =
+					new android.graphics.Paint(
+					android.graphics.Paint.ANTI_ALIAS_FLAG
+					);
+					
+					bg.setColor(noteBackground);
+					
+					float padH = 10 * density;
+					float padV = 4 * density;
+					
+					float textWidth = paint.measureText(text, start, end);
+					
+					android.graphics.RectF rect =
+					new android.graphics.RectF(
+					x,
+					y + paint.ascent() - padV,
+					x + textWidth + (20 * density),
+					y + paint.descent() + padV
+					);
+					
+					canvas.drawRoundRect(
+					rect,
+					6 * density,
+					6 * density,
+					bg
+					);
+					
+					android.graphics.Paint textPaint =
+					new android.graphics.Paint(paint);
+					
+					textPaint.setColor(noteTextColor);
+					
+					textPaint.setTypeface(
+					android.graphics.Typeface.create(
+					paint.getTypeface(),
+					android.graphics.Typeface.BOLD
+					)
+					);
+					
+					canvas.drawText(
+					text,
+					start,
+					end,
+					x + padH,
+					y,
+					textPaint
+					);
+				}
+			},
+			start,
+			end,
+			android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+			);
+			
+			searchIndex = end;
+		}
+		
+		// ----------------------------------
+		// 4. شناسایی لینک تصاویر
+		// ----------------------------------
+		
+		java.util.ArrayList<String> imageUrls =
+		new java.util.ArrayList<String>();
+		
+		java.util.ArrayList<Integer> imagePositions =
+		new java.util.ArrayList<Integer>();
+		
+		java.util.ArrayList<Integer> originalStarts =
+		new java.util.ArrayList<Integer>();
+		
+		java.util.ArrayList<Integer> originalEnds =
+		new java.util.ArrayList<Integer>();
+		
+		java.util.regex.Matcher urlMatcher =
+		java.util.regex.Pattern.compile("https?://\\S+")
+		.matcher(noteText);
+		
+		while (urlMatcher.find()) {
+			
+			String url = urlMatcher.group();
+			
+			int start = urlMatcher.start();
+			int end = urlMatcher.end();
+			
+			// حذف علائم نگارشی انتهای لینک
+			while (
+			url.length() > 0 &&
+			".,;،؛:!?؟)]}".indexOf(
+			url.charAt(url.length() - 1)
+			) != -1
+			) {
+				
+				url = url.substring(0, url.length() - 1);
+				end--;
+			}
+			
+			if (url.length() > 0) {
+				
+				originalStarts.add(start);
+				originalEnds.add(end);
+				imageUrls.add(url);
+			}
+		}
+		
+		// جایگزینی لینک‌ها با محل تصویر
+		int offset = 0;
+		
+		for (int i = 0; i < imageUrls.size(); i++) {
+			
+			int start = originalStarts.get(i) + offset;
+			int end = originalEnds.get(i) + offset;
+			
+			styledText.replace(start, end, "\uFFFC");
+			
+			imagePositions.add(start);
+			
+			offset += 1 - (
+			originalEnds.get(i) - originalStarts.get(i)
+			);
+		}
+		
+		// ----------------------------------
+		// 5. تنظیم کلیک روی تصاویر
+		// ----------------------------------
+		
+		noteView.setHighlightColor(0x00000000);
+		noteView.setLinksClickable(true);
+		
+		noteView.setMovementMethod(
+		android.text.method.LinkMovementMethod.getInstance()
+		);
+		
+		// ----------------------------------
+		// 6. ایجاد تصاویر و دانلود
+		// ----------------------------------
+		
+		final int thumbSize = (int)(30 * density);
+		
+		for (int i = 0; i < imageUrls.size(); i++) {
+			
+			final String imageUrl = imageUrls.get(i);
+			final int imagePosition = imagePositions.get(i);
+			
+			final android.graphics.Bitmap[] imageHolder =
+			new android.graphics.Bitmap[1];
+			
+			final android.text.style.ImageSpan[] spanHolder =
+			new android.text.style.ImageSpan[1];
+			
+			// تصویر موقت
+			android.graphics.drawable.GradientDrawable placeholder =
+			new android.graphics.drawable.GradientDrawable();
+			
+			placeholder.setColor(0xFF444444);
+			placeholder.setCornerRadius(8 * density);
+			
+			placeholder.setBounds(
+			0,
+			0,
+			thumbSize,
+			thumbSize
+			);
+			
+			spanHolder[0] = new android.text.style.ImageSpan(
+			placeholder,
+			imageUrl,
+			android.text.style.ImageSpan.ALIGN_BASELINE
+			);
+			
+			styledText.setSpan(
+			spanHolder[0],
+			imagePosition,
+			imagePosition + 1,
+			android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+			);
+			
+			// ----------------------------------
+			// 7. کلیک و نمایش تصویر بزرگ
+			// ----------------------------------
+			
+			styledText.setSpan(
+			new android.text.style.ClickableSpan() {
+				
+				@Override
+				public void updateDrawState(android.text.TextPaint ds) {
+					ds.setUnderlineText(false);
+				}
+				
+				@Override
+				public void onClick(android.view.View v) {
+					
+					if (imageHolder[0] == null) return;
+					
+					final android.app.Dialog dialog =
+					new android.app.Dialog(imageContext);
+					
+					android.widget.FrameLayout root =
+					new android.widget.FrameLayout(imageContext);
+					
+					root.setBackgroundColor(0xFF111111);
+					
+					// تصویر اصلی
+					android.widget.ImageView preview =
+					new android.widget.ImageView(imageContext);
+					
+					preview.setImageBitmap(imageHolder[0]);
+					
+					preview.setScaleType(
+					android.widget.ImageView.ScaleType.FIT_CENTER
+					);
+					
+					android.graphics.drawable.GradientDrawable imageBackground =
+					new android.graphics.drawable.GradientDrawable();
+					
+					imageBackground.setColor(0xFF222222);
+					imageBackground.setCornerRadius(14 * density);
+					
+					preview.setBackground(imageBackground);
+					preview.setClipToOutline(true);
+					
+					android.widget.FrameLayout.LayoutParams imageParams =
+					new android.widget.FrameLayout.LayoutParams(
+					android.widget.FrameLayout.LayoutParams.MATCH_PARENT,
+					android.widget.FrameLayout.LayoutParams.MATCH_PARENT
+					);
+					
+					imageParams.setMargins(
+					(int)(18 * density),
+					(int)(58 * density),
+					(int)(18 * density),
+					(int)(18 * density)
+					);
+					
+					root.addView(preview, imageParams);
+					
+					// دکمه خروج
+					android.widget.ImageView closeButton =
+					new android.widget.ImageView(imageContext);
+					
+					int closeIconId = imageResources.getIdentifier(
+					"icon_cancel_round",
+					"drawable",
+					imageContext.getPackageName()
+					);
+					
+					if (closeIconId != 0) {
+						
+						closeButton.setImageResource(closeIconId);
+					}
+					
+					closeButton.setScaleType(
+					android.widget.ImageView.ScaleType.FIT_CENTER
+					);
+					
+					closeButton.setPadding(
+					(int)(5 * density),
+					(int)(5 * density),
+					(int)(5 * density),
+					(int)(5 * density)
+					);
+					
+					android.widget.FrameLayout.LayoutParams closeParams =
+					new android.widget.FrameLayout.LayoutParams(
+					(int)(42 * density),
+					(int)(42 * density),
+					android.view.Gravity.TOP |
+					android.view.Gravity.RIGHT
+					);
+					
+					closeParams.setMargins(
+					0,
+					(int)(10 * density),
+					(int)(10 * density),
+					0
+					);
+					
+					root.addView(closeButton, closeParams);
+					
+					closeButton.setOnClickListener(
+					new android.view.View.OnClickListener() {
+						
+						@Override
+						public void onClick(android.view.View view) {
+							dialog.dismiss();
+						}
+					}
+					);
+					
+					dialog.setContentView(root);
+					dialog.setCancelable(true);
+					dialog.setCanceledOnTouchOutside(true);
+					
+					dialog.show();
+					
+					android.view.Window window = dialog.getWindow();
+					
+					if (window != null) {
+						
+						window.setBackgroundDrawable(
+						new android.graphics.drawable.ColorDrawable(
+						0xFF111111
+						)
+						);
+						
+						window.addFlags(
+						android.view.WindowManager.LayoutParams.FLAG_DIM_BEHIND
+						);
+						
+						android.view.WindowManager.LayoutParams params =
+						window.getAttributes();
+						
+						params.dimAmount = 0.85f;
+						
+						window.setAttributes(params);
+						
+						int screenWidth =
+						imageResources.getDisplayMetrics().widthPixels;
+						
+						int screenHeight =
+						imageResources.getDisplayMetrics().heightPixels;
+						
+						window.setLayout(
+						screenWidth - (int)(32 * density),
+						screenHeight - (int)(80 * density)
+						);
+					}
+				}
+			},
+			imagePosition,
+			imagePosition + 1,
+			android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+			);
+			
+			// ----------------------------------
+			// 8. دانلود غیرهم‌زمان تصویر
+			// ----------------------------------
+			
+			new android.os.AsyncTask<String, Void, android.graphics.Bitmap>() {
+				
+				@Override
+				protected android.graphics.Bitmap doInBackground(String... urls) {
+					
+					java.net.HttpURLConnection connection = null;
+					java.io.InputStream input = null;
+					
+					try {
+						
+						java.net.URL url = new java.net.URL(urls[0]);
+						
+						connection = (java.net.HttpURLConnection)
+						url.openConnection();
+						
+						connection.setConnectTimeout(15000);
+						connection.setReadTimeout(20000);
+						connection.setInstanceFollowRedirects(true);
+						connection.setRequestMethod("GET");
+						
+						connection.connect();
+						
+						if (connection.getResponseCode() != 200) {
+							return null;
+						}
+						
+						input = connection.getInputStream();
+						
+						return android.graphics.BitmapFactory.decodeStream(input);
+						
+					} catch (Exception e) {
+						
+						return null;
+						
+					} finally {
+						
+						try {
+							if (input != null) input.close();
+						} catch (Exception e) {}
+						
+						if (connection != null) {
+							connection.disconnect();
+						}
+					}
+				}
+				
+				@Override
+				protected void onPostExecute(android.graphics.Bitmap bitmap) {
+					
+					if (bitmap == null) return;
+					
+					if (noteView.getTag() != renderToken) return;
+					
+					imageHolder[0] = bitmap;
+					
+					// ساخت تصویر مربعی با برش مرکزی
+					android.graphics.Bitmap roundedBitmap =
+					android.graphics.Bitmap.createBitmap(
+					thumbSize,
+					thumbSize,
+					android.graphics.Bitmap.Config.ARGB_8888
+					);
+					
+					android.graphics.Canvas canvas =
+					new android.graphics.Canvas(roundedBitmap);
+					
+					android.graphics.BitmapShader shader =
+					new android.graphics.BitmapShader(
+					bitmap,
+					android.graphics.Shader.TileMode.CLAMP,
+					android.graphics.Shader.TileMode.CLAMP
+					);
+					
+					float scale = Math.max(
+					thumbSize / (float) bitmap.getWidth(),
+					thumbSize / (float) bitmap.getHeight()
+					);
+					
+					float dx =
+					(thumbSize - bitmap.getWidth() * scale) / 2f;
+					
+					float dy =
+					(thumbSize - bitmap.getHeight() * scale) / 2f;
+					
+					android.graphics.Matrix matrix =
+					new android.graphics.Matrix();
+					
+					matrix.setScale(scale, scale);
+					matrix.postTranslate(dx, dy);
+					
+					shader.setLocalMatrix(matrix);
+					
+					android.graphics.Paint paint =
+					new android.graphics.Paint(
+					android.graphics.Paint.ANTI_ALIAS_FLAG
+					);
+					
+					paint.setShader(shader);
+					
+					android.graphics.RectF rect =
+					new android.graphics.RectF(
+					0,
+					0,
+					thumbSize,
+					thumbSize
+					);
+					
+					canvas.drawRoundRect(
+					rect,
+					8 * density,
+					8 * density,
+					paint
+					);
+					
+					// تبدیل به Drawable
+					android.graphics.drawable.BitmapDrawable drawable =
+					new android.graphics.drawable.BitmapDrawable(
+					imageResources,
+					roundedBitmap
+					);
+					
+					drawable.setBounds(
+					0,
+					0,
+					thumbSize,
+					thumbSize
+					);
+					
+					// جایگزینی تصویر موقت
+					styledText.removeSpan(spanHolder[0]);
+					
+					spanHolder[0] = new android.text.style.ImageSpan(
+					drawable,
+					imageUrl,
+					android.text.style.ImageSpan.ALIGN_BASELINE
+					);
+					
+					styledText.setSpan(
+					spanHolder[0],
+					imagePosition,
+					imagePosition + 1,
+					android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+					);
+					
+					noteView.setText(
+					styledText,
+					android.widget.TextView.BufferType.SPANNABLE
+					);
+				}
+				
+			}.execute(imageUrl);
+		}
+		
+		// ----------------------------------
+		// 9. نمایش متن پردازش‌شده
+		// ----------------------------------
+		
+		noteView.setText(
+		styledText,
+		android.widget.TextView.BufferType.SPANNABLE
+		);
+		
+	}
+	binding.imageview1.setOnClickListener(new View.OnClickListener() {
+		@Override
+		public void onClick(View _view) {
+			s = true;
+			if (sv.getString(_data.get((int)_position).get("subject").toString(), "").equals("save")) {
+				sv.edit().remove(_data.get((int)_position).get("subject").toString()).commit();
+			} else {
+				sv.edit().putString(_data.get((int)_position).get("subject").toString(), "save").commit();
+			}
+		}
+	});
+}
+binding.cardview1.setCardBackgroundColor(Color.TRANSPARENT);
+binding.cardview1.setRadius((float)35);
+binding.cardview1.setCardElevation((float)0);
